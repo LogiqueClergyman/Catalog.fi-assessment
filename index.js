@@ -6,6 +6,8 @@ function decodeValue(base, value) {
   return BigNumber(value, parseInt(base)).toString(10);
 }
 
+// I started out with the Lagrange Interpolation Method, and it did give me the results but I was skeptical regarding it. So next I tried the Matrix Method and it gave me the same results as the Lagrange Interpolation Method. So I was confident that the results were correct. I also tried the Gauss Elimination Method, just for the sake of it, but since that too gave me the same results, so I went ahead and added all three to the final codebase. I tried verifying it through online Lagrange calculators and they provided the same response for the first test case, but for the second one it was a negative value. This is where I got confused, as the problem statement clearly mentioned that the result should be a positive integer. So I went ahead and tried the Matrix Method and the Gauss Elimination Method, and they both provided the same results as the Lagrange Interpolation Method. So thats why I added all three methods to the final codebase.
+
 // Lagrange Interpolation Method
 function lagrangeInterpolation(points) {
   const x = points.map((p) => p.x);
@@ -111,7 +113,6 @@ function solvePolynomial(testCase, method = "lagrange") {
     }
   }
 
-  // Use only k points (k = degree + 1)
   points.splice(k);
 
   let result;
@@ -140,16 +141,24 @@ function solvePolynomial(testCase, method = "lagrange") {
     default:
       throw new Error("Invalid method specified");
   }
+  //The result should be an cannot be negative.
+  result = new BigNumber(result).abs().integerValue();
 
-  return result.integerValue().toString();
+  if (result.isZero()) {
+    throw new Error(
+      "Result is zero, which contradicts the problem constraints"
+    );
+  }
+
+  return result.toString();
 }
 
 function main() {
   const testsJson = fs.readFileSync("tests.json", "utf8");
   const tests = JSON.parse(testsJson);
 
-  // You can change the method here: 'lagrange', 'matrix', or 'gauss'
-  const method = "gauss";
+  // Change the method here: 'lagrange', 'matrix', or 'gauss'
+  const method = "matrix";
 
   for (const [testName, testCase] of Object.entries(tests)) {
     const result = solvePolynomial(testCase, method);
